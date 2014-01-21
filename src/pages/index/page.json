@@ -1,0 +1,27 @@
+{
+	"name":			"index",
+	"files":		{
+		"index.html": {
+			"title":	"Game Elements - Device Tester",
+			"filename":	"index.html"
+		},
+		"demo.html": {
+			"title":	"Game Elements - Demo",
+			"filename":	"demo.html",
+			"template":	"app.html",
+			"dependencies":	[
+				"gameElements"
+			]
+		}
+	},
+	"template":		"main.html",
+	"dependencies":	[
+		"jquery",
+		"examples",
+		"bootstrap",
+		"screenjs",
+		"AngularJS",
+		"lesscss",
+		"lorem"
+	]
+}

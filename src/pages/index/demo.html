@@ -1,0 +1,147 @@
+<style type="text/css">
+	#screen_container {
+		margin:			0 auto;
+		padding:		0;
+	}
+	
+	.screen {
+		background-color:	#F8F8F8;
+		vertical-align:		middle;
+		text-align:			justify;
+		color:				#333333;
+		font-size:			14px;
+		padding:			10px;
+		overflow:			auto;
+	}
+</style>
+<table style="width:100%; height: 100%;">
+	<tbody>
+		<tr style="height:100%;">
+			<td>
+				<div id="screen_container" style="width:100%; height: 100%;">
+					<div class="screen" data-screenid="words">
+						<h4>Letters #1: Inset</h4>
+						<div id="letters_1"></div>
+						
+						<h4>Letters #2: Buttons</h4>
+						<div id="letters_2"></div>
+						
+						<h4>Letters #3: Mixed</h4>
+						<div id="letters_3"></div>
+						
+						<h4>Letters #4: Mixed w/ wrong</h4>
+						<div id="letters_4"></div>
+						
+					</div>
+					<div class="screen" data-screenid="keyboards">
+						<h4>Keyboard #1: QWERTY</h4>
+						<div id="keyboard_1"></div>
+						
+						<h4>Keyboard #2: Custom Layout</h4>
+						<div id="keyboard_2"></div>
+						
+						<h4>Keyboard #3: Effects</h4>
+						<div id="keyboard_3"></div>
+						
+						<h4>Keyboard #4: Events</h4>
+						<div id="keyboard_letters"></div>
+						<div id="keyboard_events"></div>
+						
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr style="height:0%;">
+			<td>
+				<select class="form-control" style="width:50%; float:right;" id="screen_list">
+					<option value="words">Word Games</option>
+					<option value="keyboards">Keyboards</option>
+				</select>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+
+<script type="text/javascript">
+	
+	var screenjs;
+	
+	$(function() {
+		
+		// Init the screens
+		screenjs = new window.screenjs($("#screen_container"));
+		
+		// Show the word screen
+		screenjs.show("keyboards");
+		$("#screen_list").val("keyboards")
+		
+		
+		/* LETTER GROUPS */
+		var letters1 = gameElements.letterGroup($('#letters_1'), {
+			number:		8
+		});
+		
+		var letters2 = gameElements.letterGroup($('#letters_2'), {
+			letters:	"fleetwit"
+		});
+		
+		var letters3 = gameElements.letterGroup($('#letters_3'), {
+			number:		"fleetwit".length
+		});
+		var completed = "fleet".split('');
+		for (i=0;i<completed.length;i++) {
+			letters3.set(i, completed[i]);
+		}
+		
+		var letters4 = gameElements.letterGroup($('#letters_4'), {
+			number:		"fleetwit".length
+		});
+		var completed = "fleew".split('');
+		for (i=0;i<completed.length;i++) {
+			letters4.set(i, completed[i]);
+		}
+		letters4.wrong(4);
+		
+		
+		/* KEYBOARDS */
+		var keyboard_querty = gameElements.keyboard($('#keyboard_1'), {
+			layout:	"qwerty"
+		});
+		
+		var keyboard_custom = gameElements.keyboard($('#keyboard_2'), {
+			layout:	[
+				"hello",
+				"world",
+				"fleetwit"
+			]
+		});
+		
+		var keyboard_effects = gameElements.keyboard($('#keyboard_3'), {
+			layout:	"qwerty"
+		});
+		keyboard_effects.disable("abc");
+		keyboard_effects.inset("fle");
+		keyboard_effects.wrong("wx");
+		
+		var keyboard_letters = gameElements.letterGroup($('#keyboard_letters'), {
+			number:		8
+		});
+		var counter1 = 0;
+		var keyboard_events = gameElements.keyboard($('#keyboard_events'), {
+			layout:		"qwerty",
+			onClick:	function(letter, key) {
+				if (counter1 < 8) {
+					keyboard_letters.set(counter1, letter);
+					counter1++;
+					keyboard_events.inset(letter);
+				}
+			}
+		});
+		
+		$("#screen_list").change(function() {
+			// Display the selected screen
+			screenjs.show($(this).val());
+		});
+	});
+</script>

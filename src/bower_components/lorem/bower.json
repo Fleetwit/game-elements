@@ -1,0 +1,9 @@
+{
+	"name": "lorem",
+	"version": "1.0.0",
+	"main": [
+		"lorem.js"
+	],
+	"dependencies":	{
+	}
+}
