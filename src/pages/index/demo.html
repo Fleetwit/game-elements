@@ -26,11 +26,20 @@
 						<h4>Letters #2: Buttons</h4>
 						<div id="letters_2"></div>
 						
+						<h4>Letters #2: Multiline</h4>
+						<div id="letters_2_2"></div>
+						
 						<h4>Letters #3: Mixed</h4>
 						<div id="letters_3"></div>
 						
 						<h4>Letters #4: Mixed w/ wrong</h4>
 						<div id="letters_4"></div>
+						
+						<h4>Letters #5: Events</h4>
+						<div id="letters_5"></div>
+						
+						<h4>Letters #6: Gravity</h4>
+						<div id="letters_6"></div>
 						
 					</div>
 					<div class="screen" data-screenid="keyboards">
@@ -57,6 +66,7 @@
 					<option value="words">Word Games</option>
 					<option value="keyboards">Keyboards</option>
 				</select>
+				<div style="line-height:34px;font-weight:bold;padding-left:6px;">Available Elements:</div>
 			</td>
 		</tr>
 	</tbody>
@@ -73,8 +83,8 @@
 		screenjs = new window.screenjs($("#screen_container"));
 		
 		// Show the word screen
-		screenjs.show("keyboards");
-		$("#screen_list").val("keyboards")
+		screenjs.show("words");
+		$("#screen_list").val("words")
 		
 		
 		/* LETTER GROUPS */
@@ -84,6 +94,10 @@
 		
 		var letters2 = gameElements.letterGroup($('#letters_2'), {
 			letters:	"fleetwit"
+		});
+		
+		var letters2_2 = gameElements.letterGroup($('#letters_2_2'), {
+			letters:	"fleetwit is cool"
 		});
 		
 		var letters3 = gameElements.letterGroup($('#letters_3'), {
@@ -103,6 +117,20 @@
 		}
 		letters4.wrong(4);
 		
+		var letters5 = gameElements.letterGroup($('#letters_5'), {
+			letters:	"click me",
+			onClick:	function(index, letter, element) {
+				letters5.empty(index);
+			}
+		});
+		
+		var letters6 = gameElements.letterGroup($('#letters_6'), {
+			letters:	"click me",
+			gravity:	true,
+			onClick:	function(index, letter, element) {
+				letters6.empty(index);
+			}
+		});
 		
 		/* KEYBOARDS */
 		var keyboard_querty = gameElements.keyboard($('#keyboard_1'), {
@@ -135,6 +163,9 @@
 					keyboard_letters.set(counter1, letter);
 					counter1++;
 					keyboard_events.inset(letter);
+				}
+				if (counter1 == 8) {
+					keyboard_events.disable();
 				}
 			}
 		});

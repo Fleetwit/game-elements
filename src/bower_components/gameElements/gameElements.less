@@ -88,6 +88,9 @@ h4 {
 		li {
 			vertical-align:	bottom;
 			.button();
+			&.wrong {
+				.button(#E03F2F);
+			}
 			display:	inline-block;
 			padding:	5px;
 			margin:		1px;
@@ -100,15 +103,15 @@ h4 {
 			@media @tablet {
 				width:		40px;
 				height:		40px;
-				line-height:20px;
+				line-height:30px;
 			}
 			@media @desktop {
 				width:		50px;
 				height:		50px;
-				line-height:24px;
+				line-height:40px;
 			}
 		}
-		li.wrong {
+		/*li.wrong {
 			.button(#E03F2F);
 			display:	inline-block;
 			padding:	5px;
@@ -129,7 +132,7 @@ h4 {
 				height:		50px;
 				line-height:24px;
 			}
-		}
+		}*/
 		&.inset li, li.inset {
 			.button-inset(#5F5F5F);
 			cursor:		default;
