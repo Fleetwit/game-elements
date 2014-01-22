@@ -14,6 +14,7 @@
 		letterGroup:	function(container, options) {
 			options = _.extend({
 				gravity:	false,
+				squeeze:	false,
 				onClick:	function() {
 					
 				}
@@ -27,6 +28,9 @@
 				var i;
 				var ul = dom("ul", container);
 					ul.addClass("gameElements letterGroup");
+					
+				
+				ul.addClass("regular");
 				if (options.number) {
 					for (i=0;i<options.number;i++) {
 						(function(i) {
@@ -126,6 +130,8 @@
 										options.onClick(keys[i][j].toLowerCase(), key);
 									}
 								});
+								// Same size for all keys on a line
+								key.css("width", (100/keys[i].length)+"%");
 							if (index[keys[i][j]]) {
 								index[keys[i][j]] = index[keys[i][j]].add(key);
 							} else {
@@ -177,6 +183,50 @@
 			output.build();
 			
 			return output;
+		},
+		container:	function(container, options) {
+			options = _.extend({
+				square:	false
+			},options);
+			
+			var output = {};
+			
+			output.build = function() {
+				output.div = dom("div", container);
+					output.div.addClass("gameElements ge-container");
+			}
+			output.build();
+			
+			output.setSquare = function() {
+				var size = {
+					container:	{
+						width:	container.width(),
+						height:	container.height()
+					}
+				};
+				size.div = {
+					width:	Math.min(size.container.width,size.container.height),
+					height:	Math.min(size.container.width,size.container.height)
+				};
+				var ratio = {
+					container:	size.container.width/size.container.height,
+					div:		1
+				};
+				console.log("size",size);
+				output.div.css({
+					width:	size.div.width,
+					height:	size.div.height
+				});
+			}
+			
+			
+			if (options.square) {
+				setInterval(function() {
+					output.setSquare();
+				}, 300);
+			}
+			
+			return output.div;
 		}
 	};
 	

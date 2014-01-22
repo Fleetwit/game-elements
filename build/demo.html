@@ -55,9 +55,6 @@
 						<h4>Letters #2: Buttons</h4>
 						<div id="letters_2"></div>
 						
-						<h4>Letters #2: Multiline</h4>
-						<div id="letters_2_2"></div>
-						
 						<h4>Letters #3: Mixed</h4>
 						<div id="letters_3"></div>
 						
@@ -69,6 +66,9 @@
 						
 						<h4>Letters #6: Gravity</h4>
 						<div id="letters_6"></div>
+						
+						<h4>Letters #7: Multiline</h4>
+						<div id="letters_7"></div>
 						
 					</div>
 					<div class="screen" data-screenid="keyboards">
@@ -86,6 +86,14 @@
 						<div id="keyboard_events"></div>
 						
 					</div>
+					<div class="screen" data-screenid="containers">
+						<h4>Container #1: Regular</h4>
+						<div id="container_1"></div>
+						
+					</div>
+					<div class="screen" data-screenid="containers_fixed" id="container_2">
+						
+					</div>
 				</div>
 			</td>
 		</tr>
@@ -94,6 +102,8 @@
 				<select class="form-control" style="width:50%; float:right;" id="screen_list">
 					<option value="words">Word Games</option>
 					<option value="keyboards">Keyboards</option>
+					<option value="containers">Containers</option>
+					<option value="containers_fixed">Containers (Square)</option>
 				</select>
 				<div style="line-height:34px;font-weight:bold;padding-left:6px;">Available Elements:</div>
 			</td>
@@ -112,8 +122,8 @@
 		screenjs = new window.screenjs($("#screen_container"));
 		
 		// Show the word screen
-		screenjs.show("words");
-		$("#screen_list").val("words")
+		screenjs.show("containers");
+		$("#screen_list").val("containers")
 		
 		
 		/* LETTER GROUPS */
@@ -123,10 +133,6 @@
 		
 		var letters2 = gameElements.letterGroup($('#letters_2'), {
 			letters:	"fleetwit"
-		});
-		
-		var letters2_2 = gameElements.letterGroup($('#letters_2_2'), {
-			letters:	"fleetwit is cool"
 		});
 		
 		var letters3 = gameElements.letterGroup($('#letters_3'), {
@@ -159,6 +165,10 @@
 			onClick:	function(index, letter, element) {
 				letters6.empty(index);
 			}
+		});
+		
+		var letters7 = gameElements.letterGroup($('#letters_7'), {
+			letters:	"fleetwit is cool"
 		});
 		
 		/* KEYBOARDS */
@@ -198,6 +208,15 @@
 				}
 			}
 		});
+		
+		/* CONTAINERS */
+		var container_1 = gameElements.container($('#container_1'));
+		container_1.html("Load your game here");
+		
+		var container_2 = gameElements.container($('#container_2'), {
+			square:	true
+		});
+		container_2.html("Load your game here");
 		
 		$("#screen_list").change(function() {
 			// Display the selected screen
