@@ -212,7 +212,6 @@
 					container:	size.container.width/size.container.height,
 					div:		1
 				};
-				console.log("size",size);
 				output.div.css({
 					width:	size.div.width,
 					height:	size.div.height
