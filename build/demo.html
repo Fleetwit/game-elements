@@ -101,14 +101,16 @@
 					<div class="screen" data-screenid="wordlist">
 						
 						<h4>Wordlist #1: Regular</h4>
-						<ul class="gameElements wordlist">
-							<li>word 1</li>
-							<li>word 2</li>
-							<li class="found">word 3</li>
-						</ul>
+						<div id="wordlist_1"></div>
 						
 						<h4>Wordlist #2: Parts</h4>
 						<div id="wordlist_2"></div>
+						<div class="clearfix"></div>
+					</div>
+					<div class="screen" data-screenid="wordlist_drop">
+						<h4>Wordlist #3: Drag & Drop</h4>
+						<p>Drop the languages on their frameworks</p>
+						<div id="wordlist_3"></div>
 					</div>
 				</div>
 			</td>
@@ -122,6 +124,7 @@
 					<option value="containers_fixed">Containers (Square)</option>
 					<option value="grid_square">Grid (Square)</option>
 					<option value="wordlist">Wordlists</option>
+					<option value="wordlist_drop">Wordlists (Drag & Drop)</option>
 				</select>
 				<div style="line-height:34px;font-weight:bold;padding-left:6px;">Available Elements:</div>
 			</td>
@@ -140,8 +143,8 @@
 		screenjs = new window.screenjs($("#screen_container"));
 		
 		// Show the word screen
-		screenjs.show("wordlist");
-		$("#screen_list").val("wordlist")
+		screenjs.show("wordlist_drop");
+		$("#screen_list").val("wordlist_drop")
 		
 		
 		/* LETTER GROUPS */
@@ -248,6 +251,15 @@
 		
 		
 		/* WORDLISTS */
+		var wordlist_1 = gameElements.wordlist($('#wordlist_1'), {
+			empty:	"[empty]"
+		});
+		wordlist_1.addWord("hello");
+		wordlist_1.addWord("world");
+		wordlist_1.addWord("airplane").empty();
+		wordlist_1.addWord("fleetwit").wrong();
+		wordlist_1.shuffle();
+		
 		var wordlist_2 = gameElements.wordpart($('#wordlist_2'), {
 			empty:	"drop here"
 		}).set(0, "air");
@@ -262,7 +274,8 @@
 		var wordlist_4 = gameElements.wordpart($('#wordlist_2'), {
 			empty:	"drop here"
 		}).set(0, "air").set(1, "bag").wrong(1);
-		
+		wordlist_4.get(1).css("cursor","move");
+		var dropped = false;
 		var drag = new gameElements.drag({
 			element:	wordlist_4.get(1),
 			target:		dropTarget,
@@ -277,13 +290,62 @@
 				console.log("...And we're done.");
 			},
 			onDrop:		function() {
-				console.log("Drop!!!!!");
+				if (!dropped) {
+					dropped = true;
+					console.log("Drop!!!!!");
+					wordlist_2.reset(1).set(1, wordlist_4.get(1).html())
+					wordlist_4.reset(1).inset(1);
+					drag.remove();
+				}
 			}
 		})
 		
-		/*.onTouch(function(touchData) {
-			console.log("onTouch()",touchData);
-		});*/
+		
+		// Create the word list
+		var wordgroups = [["jQuery","Javascript"],["Wordpress","PHP"],["ExpressJS","NodeJS"]];
+		var wordlist_3 = gameElements.wordlist($('#wordlist_3'));
+		var dropContainers = $();
+		_.each(wordgroups, function(group) {
+			
+			// Create the word parts
+			var wordpart = gameElements.wordpart($('#wordlist_3'), {
+				empty:	"drop here"
+			}).set(0, group[0]);
+			
+			dropContainers = dropContainers.add(wordpart.get(1));
+			
+			wordpart.get(1).data("word", group[1]);
+			wordpart.get(1).data("wordpart", wordpart);
+		});
+		_.each(wordgroups, function(group) {
+			// Add the word in the list
+			var word = wordlist_3.addWord(group[1]);
+			
+			// Manage the drag and drop
+			var drag = new gameElements.drag({
+				element:	word.element,
+				target:		dropContainers,
+				parent:		$('#wordlist_3'),
+				onStart:	function() {
+					console.log("Starting the drag...");
+				},
+				onDrag:		function() {
+					console.log("Dragging...");
+				},
+				onEnd:		function() {
+					console.log("...And we're done.");
+				},
+				onDrop:		function(target) {
+					if (target.data("word") == group[1]) {
+						target.data("wordpart").set(1, group[1]);
+						word.empty();
+						drag.remove();
+					}
+				}
+			})
+		});
+		wordlist_3.shuffle();
+		
 		
 		
 		

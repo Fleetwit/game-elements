@@ -33,6 +33,10 @@
 	text-shadow: -1px -1px 1px @presscolor;
 	color: @color;
 }
+.text-hide() {
+	text-shadow: 0 0 0 rgba(0,0,0,0) !important;
+	color: rgba(0,0,0,0) !important;
+}
 .text-inset-lightbg(@color, @presscolor: #ffffff) {
 	text-shadow: 1px 1px 1px @presscolor;
 	color: @color;
@@ -209,15 +213,22 @@ h4 {
 		vertical-align:	bottom;
 		
 		li {
-			vertical-align:	bottom;
 			.button();
+			vertical-align:	bottom;
 			text-transform:	uppercase;
+			
 			&.wrong {
 				.button(#E03F2F);
 			}
 			&.found {
 				.button-inset(#5F5F5F);
 				cursor:		default;
+			}
+			&.empty {
+				.button-inset(#5F5F5F);
+				cursor:		default;
+				/* hide the text */
+				.text-hide();
 			}
 			display:	inline-block;
 			padding:	4px 6px;

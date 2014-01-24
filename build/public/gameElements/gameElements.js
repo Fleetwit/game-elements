@@ -1,31 +1,3 @@
-(function($){
-    $.fn.getStyleObject = function(){
-        var dom = this.get(0);
-        var style;
-        var returns = {};
-        if(window.getComputedStyle){
-            var camelize = function(a,b){
-                return b.toUpperCase();
-            };
-            style = window.getComputedStyle(dom, null);
-            for(var i = 0, l = style.length; i < l; i++){
-                var prop = style[i];
-                var camel = prop.replace(/\-([a-z])/g, camelize);
-                var val = style.getPropertyValue(prop);
-                returns[camel] = val;
-            };
-            return returns;
-        };
-        if(style = dom.currentStyle){
-            for(var prop in style){
-                returns[prop] = style[prop];
-            };
-            return returns;
-        };
-        return this.css();
-    }
-})(jQuery);
-
 (function() {
 	
 	
@@ -174,7 +146,7 @@
 				var i,j;
 				var keyboard = dom("div", container);
 					keyboard.addClass("gameElements keyboard");
-				
+				output.element = keyboard;
 				if (_.isArray(options.layout)) {
 					var keys = options.layout;
 				} else {
@@ -398,6 +370,62 @@
 			
 			return output;
 		},
+		wordlist:	function(container, options) {
+			
+			options = _.extend({
+				number:	4,
+				empty:	"",
+				words:	["hello","world","fleetwit"]
+			},options);
+			
+			var output = {
+				words:	{}
+			};
+			
+			output.group = $();
+			
+			output.build = function() {
+				output.element = dom("ul", container);
+				output.element.addClass("gameElements wordlist");
+			}
+			output.build();
+			
+			output.shuffle = function() {
+				var elems = output.element.children();
+				elems.sort(function() { return (Math.round(Math.random())-0.5); });
+				elems.detach();
+				for(var i=0; i < elems.length; i++) {
+					output.element.append(elems[i]);
+				}
+				return output;
+			}
+			output.addWord = function(word) {
+				var li = dom("li",output.element);
+				if (word) {
+					li.html(word);
+				}
+				var wid = _.uniqueId('word');
+				output.words[wid] = li;
+				
+				return {
+					empty:	function() {
+						li.addClass("empty").removeClass("wrong");
+					},
+					wrong:	function() {
+						li.removeClass("empty").addClass("wrong");
+					},
+					show:	function() {
+						li.removeClass("empty").removeClass("wrong");
+					},
+					set:	function(word) {
+						li.html(word);
+					},
+					element:	li
+				};
+			}
+			
+			return output;
+		},
 		wordpart:	function(container, options) {
 			
 			options = _.extend({
@@ -426,8 +454,8 @@
 			
 			output.set = function(index, content) {
 				if (output.blocks[index]) {
-					output.blocks[index].html(content);
 					output.reset(index);
+					output.blocks[index].html(content);
 				}
 				return output;
 			}
@@ -443,9 +471,16 @@
 				}
 				return output;
 			}
+			output.inset = function(index) {
+				if (output.blocks[index]) {
+					output.blocks[index].addClass("inset").removeClass("wrong");
+				}
+				return output;
+			}
 			output.reset = function(index) {
 				if (output.blocks[index]) {
 					output.blocks[index].removeClass("inset").removeClass("wrong");
+					output.blocks[index].html(options.empty);
 				}
 				return output;
 			}
@@ -484,40 +519,6 @@
 		};
 		return this.css();
 	}
-	
-	function css2(a) {
-		var sheets = document.styleSheets, o = {};
-		for (var i in sheets) {
-			var rules = sheets[i].rules || sheets[i].cssRules;
-			for (var r in rules) {
-				if (a.is(rules[r].selectorText)) {
-					o = $.extend(o, css2json(rules[r].style), css2json(a.attr('style')));
-				}
-			}
-		}
-		return o;
-	}
-	
-	function css2json(css) {
-		var s = {};
-		if (!css) return s;
-		if (css instanceof CSSStyleDeclaration) {
-			for (var i in css) {
-				if ((css[i]).toLowerCase) {
-					s[(css[i]).toLowerCase()] = (css[css[i]]);
-				}
-			}
-		} else if (typeof css == "string") {
-			css = css.split("; ");
-			for (var i in css) {
-				var l = css[i].split(": ");
-				s[l[0].toLowerCase()] = (l[1]);
-			}
-		}
-		return s;
-	}
-	
-	
 	
 	var element2D = function(element) {
 		this.element = element;
@@ -558,21 +559,34 @@
 		
 		this.init();
 	}
+	drag.prototype.remove = function() {
+		this.touchEvent.unbind();
+	}
 	drag.prototype.init = function() {
-		console.log("Drag() initiated.");
 		var scope = this;
-		this.touchEvent = touchEvent(this.options.parent, function(touchData) {
+		this.touchEvent = new touchEvent(this.options.parent, function(touchData) {
 			
-			var e2d_target 		= new element2D(scope.options.target);
-			var hit_target		= e2d_target.hittest({
-				x:	touchData.pos.x,
-				y:	touchData.pos.y
-			});
 			var e2d_element 	= new element2D(scope.options.element);
 			var hit_element		= e2d_element.hittest({
 				x:	touchData.pos.x,
 				y:	touchData.pos.y
 			});
+			
+			
+			var hit_target		= false;
+			var drop_target		= $();
+			scope.options.target.each(function(idx, target) {
+				var e2d_target 		= new element2D($(target));
+				var hit = e2d_target.hittest({
+					x:	touchData.pos.x,
+					y:	touchData.pos.y
+				});
+				hit_target |= hit;
+				if (hit) {
+					drop_target = $(target);
+				}
+			});
+			
 			
 			switch (touchData.type) {
 				case "mousedown":
@@ -585,9 +599,11 @@
 						
 						scope.mousedown = true;
 						
+						// Force the CSS, ignore classes
+						scope.options.element.css(css(scope.options.element));
+						
 						// Clone the element
 						scope.clone = scope.options.element.clone().appendTo(scope.options.element.parent());
-						
 						scope.options.element.css('opacity', 0.2);
 						scope.clone.css('opacity', 0.9);
 						scope.clone.css({
@@ -597,6 +613,8 @@
 							left:		touchData.pos.x-scope.offset.x,
 							top:		touchData.pos.y-scope.offset.y
 						});
+						
+						
 						
 						// Callback
 						scope.options.onStart();
@@ -613,14 +631,15 @@
 						// Remove the clone
 						scope.clone.remove();
 						
+						// Reset the hard styles
+						scope.options.element.get(0).style = "";
+						
 						if (hit_target) {
-							scope.options.onDrop();
+							scope.options.onDrop(drop_target);
 						}
 						
 						// Callback
 						scope.options.onEnd();
-						
-						console.log("CSS",css(scope.options.element),$(scope.options.element).getStyleObject());
 					}
 				break;
 				case "mousedrag":

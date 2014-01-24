@@ -146,7 +146,7 @@
 				var i,j;
 				var keyboard = dom("div", container);
 					keyboard.addClass("gameElements keyboard");
-				
+				output.element = keyboard;
 				if (_.isArray(options.layout)) {
 					var keys = options.layout;
 				} else {
@@ -370,6 +370,62 @@
 			
 			return output;
 		},
+		wordlist:	function(container, options) {
+			
+			options = _.extend({
+				number:	4,
+				empty:	"",
+				words:	["hello","world","fleetwit"]
+			},options);
+			
+			var output = {
+				words:	{}
+			};
+			
+			output.group = $();
+			
+			output.build = function() {
+				output.element = dom("ul", container);
+				output.element.addClass("gameElements wordlist");
+			}
+			output.build();
+			
+			output.shuffle = function() {
+				var elems = output.element.children();
+				elems.sort(function() { return (Math.round(Math.random())-0.5); });
+				elems.detach();
+				for(var i=0; i < elems.length; i++) {
+					output.element.append(elems[i]);
+				}
+				return output;
+			}
+			output.addWord = function(word) {
+				var li = dom("li",output.element);
+				if (word) {
+					li.html(word);
+				}
+				var wid = _.uniqueId('word');
+				output.words[wid] = li;
+				
+				return {
+					empty:	function() {
+						li.addClass("empty").removeClass("wrong");
+					},
+					wrong:	function() {
+						li.removeClass("empty").addClass("wrong");
+					},
+					show:	function() {
+						li.removeClass("empty").removeClass("wrong");
+					},
+					set:	function(word) {
+						li.html(word);
+					},
+					element:	li
+				};
+			}
+			
+			return output;
+		},
 		wordpart:	function(container, options) {
 			
 			options = _.extend({
@@ -398,8 +454,8 @@
 			
 			output.set = function(index, content) {
 				if (output.blocks[index]) {
-					output.blocks[index].html(content);
 					output.reset(index);
+					output.blocks[index].html(content);
 				}
 				return output;
 			}
@@ -415,9 +471,16 @@
 				}
 				return output;
 			}
+			output.inset = function(index) {
+				if (output.blocks[index]) {
+					output.blocks[index].addClass("inset").removeClass("wrong");
+				}
+				return output;
+			}
 			output.reset = function(index) {
 				if (output.blocks[index]) {
 					output.blocks[index].removeClass("inset").removeClass("wrong");
+					output.blocks[index].html(options.empty);
 				}
 				return output;
 			}
@@ -496,21 +559,34 @@
 		
 		this.init();
 	}
+	drag.prototype.remove = function() {
+		this.touchEvent.unbind();
+	}
 	drag.prototype.init = function() {
-		console.log("Drag() initiated.");
 		var scope = this;
-		this.touchEvent = touchEvent(this.options.parent, function(touchData) {
+		this.touchEvent = new touchEvent(this.options.parent, function(touchData) {
 			
-			var e2d_target 		= new element2D(scope.options.target);
-			var hit_target		= e2d_target.hittest({
-				x:	touchData.pos.x,
-				y:	touchData.pos.y
-			});
 			var e2d_element 	= new element2D(scope.options.element);
 			var hit_element		= e2d_element.hittest({
 				x:	touchData.pos.x,
 				y:	touchData.pos.y
 			});
+			
+			
+			var hit_target		= false;
+			var drop_target		= $();
+			scope.options.target.each(function(idx, target) {
+				var e2d_target 		= new element2D($(target));
+				var hit = e2d_target.hittest({
+					x:	touchData.pos.x,
+					y:	touchData.pos.y
+				});
+				hit_target |= hit;
+				if (hit) {
+					drop_target = $(target);
+				}
+			});
+			
 			
 			switch (touchData.type) {
 				case "mousedown":
@@ -523,9 +599,11 @@
 						
 						scope.mousedown = true;
 						
+						// Force the CSS, ignore classes
+						scope.options.element.css(css(scope.options.element));
+						
 						// Clone the element
 						scope.clone = scope.options.element.clone().appendTo(scope.options.element.parent());
-						scope.options.element.css(css(scope.options.element));
 						scope.options.element.css('opacity', 0.2);
 						scope.clone.css('opacity', 0.9);
 						scope.clone.css({
@@ -553,8 +631,11 @@
 						// Remove the clone
 						scope.clone.remove();
 						
+						// Reset the hard styles
+						scope.options.element.get(0).style = "";
+						
 						if (hit_target) {
-							scope.options.onDrop();
+							scope.options.onDrop(drop_target);
 						}
 						
 						// Callback
