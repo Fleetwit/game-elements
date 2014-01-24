@@ -221,6 +221,9 @@
 		var wordlist_2 = gameElements.wordpart($('#wordlist_2'), {
 			empty:	"drop here"
 		}).set(0, "air");
+		var dropTarget = wordlist_2.get(1);
+		console.log("Drop Target:",dropTarget);
+		
 		
 		var wordlist_3 = gameElements.wordpart($('#wordlist_2'), {
 			empty:	"drop here"
@@ -229,6 +232,28 @@
 		var wordlist_4 = gameElements.wordpart($('#wordlist_2'), {
 			empty:	"drop here"
 		}).set(0, "air").set(1, "bag").wrong(1);
+		
+		var drag = new gameElements.drag({
+			element:	wordlist_4.get(1),
+			target:		dropTarget,
+			parent:		$('#wordlist_2').parent(),
+			onStart:	function() {
+				console.log("Starting the drag...");
+			},
+			onDrag:		function() {
+				console.log("Dragging...");
+			},
+			onEnd:		function() {
+				console.log("...And we're done.");
+			},
+			onDrop:		function() {
+				console.log("Drop!!!!!");
+			}
+		})
+		
+		/*.onTouch(function(touchData) {
+			console.log("onTouch()",touchData);
+		});*/
 		
 		
 		

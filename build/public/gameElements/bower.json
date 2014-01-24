@@ -10,6 +10,7 @@
 		"underscore":	"latest",
 		"json2":		"latest",
 		"bootstrap":	"latest",
-		"lesscss":		"latest"
+		"lesscss":		"latest",
+		"touchEvent":	"latest"
 	}
 }

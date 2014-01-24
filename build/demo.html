@@ -14,11 +14,14 @@
 <link href="public/examples/custom.css" rel="stylesheet">
 		<link rel="stylesheet/less" type="text/css" href="public/gameElements/gameElements.less" />
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular.min.js"></script>
-<script src="http://www.fleetwit.com/system/libs/clientside/jquery/jquery-1.8.2.js"></script>
+<script src="public/jquery/jquery.js"></script>
 <script src="public/bootstrap/./dist/js/bootstrap.js"></script>
 <script src="public/underscore/underscore-min.js"></script>
 <script src="public/json2/json2.js"></script>
 <script src="http://www.fleetwit.com/system/libs/clientside/less/less-1.6.0.min.js"></script>
+<script src="public/touchEvent/jquery.mobile.just-touch.js"></script>
+<script src="public/touchEvent/touchevent.js"></script>
+<script src="public/touchEvent/jlib.js"></script>
 <script src="public/gameElements/gameElements.js"></script>
 <script src="public/lorem/lorem.js"></script>
 <script src="public/screenjs/screenjs.js"></script>
@@ -248,6 +251,9 @@
 		var wordlist_2 = gameElements.wordpart($('#wordlist_2'), {
 			empty:	"drop here"
 		}).set(0, "air");
+		var dropTarget = wordlist_2.get(1);
+		console.log("Drop Target:",dropTarget);
+		
 		
 		var wordlist_3 = gameElements.wordpart($('#wordlist_2'), {
 			empty:	"drop here"
@@ -256,6 +262,28 @@
 		var wordlist_4 = gameElements.wordpart($('#wordlist_2'), {
 			empty:	"drop here"
 		}).set(0, "air").set(1, "bag").wrong(1);
+		
+		var drag = new gameElements.drag({
+			element:	wordlist_4.get(1),
+			target:		dropTarget,
+			parent:		$('#wordlist_2').parent(),
+			onStart:	function() {
+				console.log("Starting the drag...");
+			},
+			onDrag:		function() {
+				console.log("Dragging...");
+			},
+			onEnd:		function() {
+				console.log("...And we're done.");
+			},
+			onDrop:		function() {
+				console.log("Drop!!!!!");
+			}
+		})
+		
+		/*.onTouch(function(touchData) {
+			console.log("onTouch()",touchData);
+		});*/
 		
 		
 		

@@ -10,6 +10,7 @@
 		return (raw === true)?element:$(element);
 	};
 	
+	
 	var gameElements = {
 		letterGroup:	function(container, options) {
 			options = _.extend({
@@ -402,6 +403,12 @@
 				}
 				return output;
 			}
+			output.get = function(index) {
+				if (output.blocks[index]) {
+					return output.blocks[index]
+				}
+				return false;
+			}
 			output.wrong = function(index) {
 				if (output.blocks[index]) {
 					output.blocks[index].removeClass("inset").addClass("wrong");
@@ -414,11 +421,163 @@
 				}
 				return output;
 			}
+			output.onTouch = function(cb) {
+				output.touchEvent = touchEvent(container, cb, true);
+			}
 			
 			
 			return output;
 		}
 	};
+	
+	
+	function css(element) {
+		var dom = element.get(0);
+		var style;
+		var returns = {};
+		if(window.getComputedStyle){
+			var camelize = function(a,b){
+				return b.toUpperCase();
+			};
+			style = window.getComputedStyle(dom, null);
+			for(var i = 0, l = style.length; i < l; i++){
+				var prop = style[i];
+				var camel = prop.replace(/\-([a-z])/g, camelize);
+				var val = style.getPropertyValue(prop);
+				returns[camel] = val;
+			};
+			return returns;
+		};
+		if(style = dom.currentStyle){
+			for(var prop in style){
+				returns[prop] = style[prop];
+			};
+			return returns;
+		};
+		return this.css();
+	}
+	
+	var element2D = function(element) {
+		this.element = element;
+	}
+	element2D.prototype.hittest = function(target) {
+		if (_.isObject(target) && _.isNumber(target.x) && _.isNumber(target.y)) {
+			var offset = this.element.offset();
+			if (target.x >= offset.left && target.x <= offset.left+this.element.outerWidth() && target.y >= offset.top && target.y <= offset.top+this.element.outerHeight()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	var spacialUtils = {
+		hittest: {
+			point:	function() {
+				
+			}
+		}
+	};
+	
+	var drag = function(options) {
+		this.options = _.extend({
+			element:	$(),
+			target:		$(),
+			parent:		$(),
+			onStart:	function() {},
+			onDrag:		function() {},
+			onEnd:		function() {},
+			onDrop:		function() {}
+		},options);
+		
+		// Variables
+		this.mousedown 	= false;
+		this.clone		= $();
+		this.offset		= {x:0, y:0};
+		
+		this.init();
+	}
+	drag.prototype.init = function() {
+		console.log("Drag() initiated.");
+		var scope = this;
+		this.touchEvent = touchEvent(this.options.parent, function(touchData) {
+			
+			var e2d_target 		= new element2D(scope.options.target);
+			var hit_target		= e2d_target.hittest({
+				x:	touchData.pos.x,
+				y:	touchData.pos.y
+			});
+			var e2d_element 	= new element2D(scope.options.element);
+			var hit_element		= e2d_element.hittest({
+				x:	touchData.pos.x,
+				y:	touchData.pos.y
+			});
+			
+			switch (touchData.type) {
+				case "mousedown":
+					if (hit_element) {
+						
+						// Calculate the offset
+						var pos = scope.options.element.offset();
+						scope.offset.x = touchData.pos.x-pos.left;
+						scope.offset.y = touchData.pos.y-pos.top;
+						
+						scope.mousedown = true;
+						
+						// Clone the element
+						scope.clone = scope.options.element.clone().appendTo(scope.options.element.parent());
+						scope.options.element.css(css(scope.options.element));
+						scope.options.element.css('opacity', 0.2);
+						scope.clone.css('opacity', 0.9);
+						scope.clone.css({
+							position:	'absolute',
+							width:		scope.options.element.outerWidth(),
+							height:		scope.options.element.outerHeight(),
+							left:		touchData.pos.x-scope.offset.x,
+							top:		touchData.pos.y-scope.offset.y
+						});
+						
+						
+						
+						// Callback
+						scope.options.onStart();
+					}
+				break;
+				case "mouseup":
+					if (scope.mousedown) {
+						
+						scope.mousedown = false;
+						
+						
+						scope.options.element.css('opacity', 1);
+						
+						// Remove the clone
+						scope.clone.remove();
+						
+						if (hit_target) {
+							scope.options.onDrop();
+						}
+						
+						// Callback
+						scope.options.onEnd();
+					}
+				break;
+				case "mousedrag":
+					if (scope.mousedown) {
+						// Move the clone
+						scope.clone.css({
+							left:		touchData.pos.x-scope.offset.x,
+							top:		touchData.pos.y-scope.offset.y
+						});
+						
+						// Callback
+						scope.options.onDrag();
+					}
+				break;
+			}
+		}, true);
+	}
+	
+	gameElements.drag = drag;
 	
 	// Global scope
 	window.gameElements 		= gameElements;
