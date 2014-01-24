@@ -65,6 +65,21 @@
 					<div class="screen" data-screenid="containers_fixed" id="container_2">
 						
 					</div>
+					<div class="screen" data-screenid="grid_square" id="grid_square">
+						
+					</div>
+					<div class="screen" data-screenid="wordlist">
+						
+						<h4>Wordlist #1: Regular</h4>
+						<ul class="gameElements wordlist">
+							<li>word 1</li>
+							<li>word 2</li>
+							<li class="found">word 3</li>
+						</ul>
+						
+						<h4>Wordlist #2: Parts</h4>
+						<div id="wordlist_2"></div>
+					</div>
 				</div>
 			</td>
 		</tr>
@@ -75,6 +90,8 @@
 					<option value="keyboards">Keyboards</option>
 					<option value="containers">Containers</option>
 					<option value="containers_fixed">Containers (Square)</option>
+					<option value="grid_square">Grid (Square)</option>
+					<option value="wordlist">Wordlists</option>
 				</select>
 				<div style="line-height:34px;font-weight:bold;padding-left:6px;">Available Elements:</div>
 			</td>
@@ -93,8 +110,8 @@
 		screenjs = new window.screenjs($("#screen_container"));
 		
 		// Show the word screen
-		screenjs.show("containers");
-		$("#screen_list").val("containers")
+		screenjs.show("wordlist");
+		$("#screen_list").val("wordlist")
 		
 		
 		/* LETTER GROUPS */
@@ -142,6 +159,7 @@
 			letters:	"fleetwit is cool"
 		});
 		
+		
 		/* KEYBOARDS */
 		var keyboard_querty = gameElements.keyboard($('#keyboard_1'), {
 			layout:	"qwerty"
@@ -180,6 +198,7 @@
 			}
 		});
 		
+		
 		/* CONTAINERS */
 		var container_1 = gameElements.container($('#container_1'));
 		container_1.html("Load your game here");
@@ -188,6 +207,30 @@
 			square:	true
 		});
 		container_2.html("Load your game here");
+		
+		
+		/* GRID */
+		var grid_square = gameElements.grid($('#grid_square'), {
+			width:		3,
+			height:		3,
+			square:		true
+		});
+		
+		
+		/* WORDLISTS */
+		var wordlist_2 = gameElements.wordpart($('#wordlist_2'), {
+			empty:	"drop here"
+		}).set(0, "air");
+		
+		var wordlist_3 = gameElements.wordpart($('#wordlist_2'), {
+			empty:	"drop here"
+		}).set(0, "air").set(1, "plane");
+		
+		var wordlist_4 = gameElements.wordpart($('#wordlist_2'), {
+			empty:	"drop here"
+		}).set(0, "air").set(1, "bag").wrong(1);
+		
+		
 		
 		$("#screen_list").change(function() {
 			// Display the selected screen
