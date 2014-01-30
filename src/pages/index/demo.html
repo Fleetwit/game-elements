@@ -76,11 +76,18 @@
 						<h4>Wordlist #2: Parts</h4>
 						<div id="wordlist_2"></div>
 						<div class="clearfix"></div>
+						
+						<h4>Wordlist #3: Sortable List</h4>
+						<div id="wordlist_block"></div>
 					</div>
 					<div class="screen" data-screenid="wordlist_drop">
-						<h4>Wordlist #3: Drag & Drop</h4>
+						<h4>Wordlist #4: Drag & Drop</h4>
 						<p>Drop the languages on their frameworks</p>
-						<div id="wordlist_3"></div>
+						<div id="wordlist_4"></div>
+					</div>
+					<div class="screen" data-screenid="images">
+						<h4>Image #1: container</h4>
+						<div id="images_1"></div>
 					</div>
 				</div>
 			</td>
@@ -95,6 +102,7 @@
 					<option value="grid_square">Grid (Square)</option>
 					<option value="wordlist">Wordlists</option>
 					<option value="wordlist_drop">Wordlists (Drag & Drop)</option>
+					<option value="images">Images</option>
 				</select>
 				<div style="line-height:34px;font-weight:bold;padding-left:6px;">Available Elements:</div>
 			</td>
@@ -113,8 +121,8 @@
 		screenjs = new window.screenjs($("#screen_container"));
 		
 		// Show the word screen
-		screenjs.show("wordlist_drop");
-		$("#screen_list").val("wordlist_drop")
+		screenjs.show("wordlist");
+		$("#screen_list").val("wordlist")
 		
 		
 		/* LETTER GROUPS */
@@ -315,6 +323,40 @@
 			})
 		});
 		wordlist_3.shuffle();
+		
+		
+		var wordlist_block = gameElements.wordlist($('#wordlist_block'), {
+			empty:	"[empty]",
+			block:	true
+		});
+		wordlist_block.addWord("hello");
+		wordlist_block.addWord("world");
+		wordlist_block.addWord("airplane").empty();
+		wordlist_block.addWord("Hey there!").inset();
+		wordlist_block.addWord("fleetwit").wrong();
+		wordlist_block.shuffle();
+		
+		var sorter = new gameElements.sortlist({
+			element:	wordlist_block.element,
+			parent:		$('#wordlist_block').parent(),
+			onStart:	function() {
+				console.log("Starting the drag...");
+			},
+			onSort:		function() {
+				console.log("Sorted.", sorter.serialize());
+			},
+			onEnd:		function() {
+				console.log("...And we're done.");
+			}
+		})
+		
+		
+		/* IMAGES */
+		var images_1 = gameElements.imageContainer($('#images_1'), {
+			src:		"http://www.fleetwit.com/races/images/jetbluerace/07/01.jpg",
+			autosize:	true
+		});
+		images_1.label("Hey!");
 		
 		
 		
